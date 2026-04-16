@@ -2,43 +2,11 @@
 
 # ✨ Sparkle
 
-> AI is just the red string.
+> AI is just the red string.♥️🧵
+
 
 Chat casually with AI. Share your random thoughts, music, feelings. When you're ready, Sparkle finds someone who resonates with you — not because you have the same goals, but because you're human in the same way.
 
-## Stack
-
-- **Next.js 14** (App Router)
-- **Supabase** — auth, PostgreSQL, pgvector (semantic matching), Realtime (live chat)
-- **OpenAI GPT-4o** — AI chat + embeddings for matching
-- **Tailwind CSS**
-
-## Setup
-
-### 1. Supabase
-
-1. Create a project at [supabase.com](https://supabase.com)
-2. Run `supabase/schema.sql` in the SQL editor
-3. Enable Realtime for the `spark_messages` table
-
-### 2. Environment
-
-Copy `.env.local` and fill in your keys:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-OPENAI_API_KEY=
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### 3. Run
-
-```bash
-npm install
-npm run dev
-```
 
 ## How it works
 
