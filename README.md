@@ -1,0 +1,55 @@
+# Sparkles-humans-are-connected-by-agents
+
+# ✨ Sparkle
+
+> AI is just the red string.
+
+Chat casually with AI. Share your random thoughts, music, feelings. When you're ready, Sparkle finds someone who resonates with you — not because you have the same goals, but because you're human in the same way.
+
+## Stack
+
+- **Next.js 14** (App Router)
+- **Supabase** — auth, PostgreSQL, pgvector (semantic matching), Realtime (live chat)
+- **OpenAI GPT-4o** — AI chat + embeddings for matching
+- **Tailwind CSS**
+
+## Setup
+
+### 1. Supabase
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run `supabase/schema.sql` in the SQL editor
+3. Enable Realtime for the `spark_messages` table
+
+### 2. Environment
+
+Copy `.env.local` and fill in your keys:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+OPENAI_API_KEY=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 3. Run
+
+```bash
+npm install
+npm run dev
+```
+
+## How it works
+
+1. **Chat** — talk to Sparkle AI about anything. No profile, no goals.
+2. **Embed** — every 10 messages, your chat history is summarized into a "soul" and embedded as a vector.
+3. **Spark** — tap ⚡ to find a match. pgvector finds the most semantically similar person. AI generates a one-sentence reason why you two might connect.
+4. **Thread** — if both accept, a real-time text thread opens. The AI steps back. The humans take over.
+
+## Core philosophy
+
+- AI's only job is to connect, then disappear
+- No engagement maximization — no streaks, no notifications, no FOMO
+- User owns their data — full delete available
+- Crisis protocol built in (Crisis Text Line surfaced when needed)
