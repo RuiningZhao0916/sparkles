@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { generateEmbedding, generateSparkReason } from "@/lib/openai";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { generateSparkReason } from "@/lib/openai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -7,8 +8,14 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Use service role to bypass RLS for embedding lookup and matching
+  const adminSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   // Get current user's embedding
-  const { data: myEmbedding } = await supabase
+  const { data: myEmbedding } = await adminSupabase
     .from("user_embeddings")
     .select("embedding, summary")
     .eq("user_id", user.id)
@@ -22,7 +29,7 @@ export async function POST(req: Request) {
   }
 
   // Find similar users via pgvector
-  const { data: candidates } = await supabase.rpc("match_users", {
+  const { data: candidates } = await adminSupabase.rpc("match_users", {
     query_embedding: myEmbedding.embedding,
     exclude_user_id: user.id,
     match_count: 3,
