@@ -3,6 +3,10 @@
 > AI is just the red string.♥️🧵
 
 
+We talk with AI everyday, “Im listening to a sad song”, “I want to learn how to cook spaghetti with meatballs”, “will there be aliens”. We shared everything with AI as we want to be seen, to be understood, to be listened, and the most importantly, to be connected.
+
+However, AI is just AI, it is not the answer, not the solution, not the connection we are looking for.
+
 Chat casually with AI. Share your random thoughts, music, feelings. When you're ready, Sparkle finds someone who resonates with you — not because you have the same goals, but because you're human in the same way.
 
 
