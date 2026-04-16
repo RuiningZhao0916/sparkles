@@ -49,16 +49,16 @@ export async function POST(req: Request) {
     content: reply,
   });
 
-  // Every 10 user messages, update the embedding in the background
+  // Every 5 user messages, update the embedding in the background
   const { count } = await supabase
     .from("messages")
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id)
     .eq("role", "user");
 
-  if (count && count % 10 === 0) {
-    // Fire and forget — don't await
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/embeddings/update`, {
+  if (count && count % 5 === 0) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.VERCEL_URL}`;
+    fetch(`${appUrl}/api/embeddings/update`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: user.id }),

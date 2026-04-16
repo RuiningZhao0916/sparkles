@@ -15,12 +15,13 @@ export async function POST(req: Request) {
     .eq("user_id", userId)
     .order("created_at", { ascending: true });
 
-  if (!messages || messages.length < 5) {
+  const userMessages = messages.filter((m) => m.role === "user");
+  if (userMessages.length < 1) {
     return NextResponse.json({ skipped: true });
   }
 
   // Generate soul summary
-  const summary = await summarizeUserSoul(messages);
+  const summary = await summarizeUserSoul(userMessages);
 
   // Generate embedding from summary
   const embedding = await generateEmbedding(summary);
