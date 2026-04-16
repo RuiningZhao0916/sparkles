@@ -63,10 +63,11 @@ export async function generateSparkReason(
     messages: [
       {
         role: "system",
-        content: `You are finding the spark between two people. 
-        Given two descriptions of people, write ONE sentence explaining why they might connect — 
-        focus on a specific, authentic shared thread, not generic similarities.
-        Be warm, specific, and a little poetic. Start with "You both..."`,
+        content: `You are finding the spark between two people.
+        Given two descriptions of people, write ONE warm, casual sentence that feels like a gentle nudge from a friend — 
+        like "there's someone who's been thinking about the same thing lately" or "someone who knows what it feels like to miss home".
+        Focus on the emotional or human thread they share, not surface-level interests.
+        Be warm, specific, and a little poetic. Never mention names. Start with "There's someone..."`,
       },
       {
         role: "user",
@@ -75,5 +76,5 @@ export async function generateSparkReason(
     ],
     max_tokens: 80,
   });
-  return response.choices[0].message.content ?? "You both carry something worth sharing.";
+  return response.choices[0].message.content ?? "There's someone who might just get it.";
 }

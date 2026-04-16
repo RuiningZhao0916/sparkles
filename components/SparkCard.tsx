@@ -24,6 +24,9 @@ export default function SparkCard({
     });
     setResponded(true);
     setAccepted(action === "accept");
+    if (action === "accept") {
+      window.location.href = `/spark/${sparkId}`;
+    }
   }
 
   if (responded) {
@@ -54,9 +57,10 @@ export default function SparkCard({
         </div>
         <div>
           <p className="text-xs text-orange-400/70 mb-1 font-medium uppercase tracking-wide">
-            {isPending ? "Someone wants to connect" : "A spark found"}
+            {isPending ? "Someone wants to connect" : "✨ A spark found"}
           </p>
-          <p className="text-zinc-200 text-sm leading-relaxed">{reason}</p>
+          <p className="text-zinc-200 text-sm leading-relaxed italic">&ldquo;{reason}&rdquo;</p>
+          <p className="text-zinc-500 text-xs mt-2">Want to say hi?</p>
         </div>
       </div>
 

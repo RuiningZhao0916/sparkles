@@ -45,6 +45,13 @@ export async function POST(req: Request) {
   // Pick the best candidate
   const best = candidates[0];
 
+  // Get best candidate's profile
+  const { data: bestProfile } = await adminSupabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", best.user_id)
+    .single();
+
   // Check if a spark already exists between these two
   const { data: existing } = await supabase
     .from("sparks")
@@ -76,5 +83,13 @@ export async function POST(req: Request) {
     .select()
     .single();
 
-  return NextResponse.json({ spark, reason });
+  return NextResponse.json({
+    spark,
+    reason,
+    match: {
+      summary: best.summary,
+      similarity: Math.round(best.similarity * 100),
+      displayName: bestProfile?.display_name ?? "Someone",
+    },
+  });
 }

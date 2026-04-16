@@ -70,7 +70,7 @@ export default function ChatInterface({
     const data = await res.json();
 
     if (data.spark) {
-      setMatchResult({ reason: data.reason, sparkId: data.spark.id });
+      setMatchResult({ reason: data.reason, sparkId: data.spark.id, match: data.match });
       setActiveSparks((prev) => [data.spark, ...prev]);
     } else {
       setMatchResult({ error: data.message });
