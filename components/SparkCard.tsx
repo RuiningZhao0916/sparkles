@@ -50,14 +50,19 @@ export default function SparkCard({
   }
 
   return (
-    <div className="bg-zinc-900 border border-orange-500/20 rounded-2xl p-5 sparkle-glow">
+    <div className="relative bg-zinc-900 border border-orange-500/20 rounded-2xl p-5 sparkle-glow overflow-hidden">
+      {/* Red string accent */}
+      <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+      {/* Bubble shimmer corner */}
+      <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-white/5 blur-xl pointer-events-none" />
+
       <div className="flex items-start gap-3 mb-4">
         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500/30 to-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
           <Sparkles className="w-4 h-4 text-orange-400" />
         </div>
         <div>
           <p className="text-xs text-orange-400/70 mb-1 font-medium uppercase tracking-wide">
-            {isPending ? "Someone wants to connect" : "✨ A spark found"}
+            {isPending ? "Someone wants to connect" : "✦ A spark found"}
           </p>
           <p className="text-zinc-200 text-sm leading-relaxed italic">&ldquo;{reason}&rdquo;</p>
           <p className="text-zinc-500 text-xs mt-2">Want to say hi?</p>

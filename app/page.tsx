@@ -48,6 +48,13 @@ export default function HomePage() {
       <p className="mt-16 text-xs text-zinc-700 max-w-sm">
         &ldquo;After all, humans need humans.&rdquo;
       </p>
+
+      {/* Red string decoration */}
+      <div className="mt-6 flex items-center gap-3 opacity-30">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-red-500" />
+        <span className="text-red-500 text-xs">🗝️</span>
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-red-500" />
+      </div>
     </main>
   );
 }

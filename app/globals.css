@@ -29,3 +29,115 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ── Ambient scene ── */
+
+/* Floating sparkle stars */
+@keyframes sparkle-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%       { transform: translateY(-18px) scale(1.15); opacity: 1; }
+}
+@keyframes sparkle-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8) rotate(0deg); }
+  50%       { opacity: 0.9;  transform: scale(1.2) rotate(20deg); }
+}
+
+.ambient-sparkle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  animation: sparkle-twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  color: rgba(255,255,255, 0.7);
+  font-size: var(--size, 14px);
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+}
+
+/* Glowing bubbles */
+@keyframes bubble-rise {
+  0%   { transform: translateY(0) scale(1);   opacity: 0.55; }
+  50%  { transform: translateY(-30px) scale(1.08); opacity: 0.8; }
+  100% { transform: translateY(0) scale(1);   opacity: 0.55; }
+}
+
+.ambient-bubble {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.55), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 12px rgba(255,255,255,0.12), inset 0 0 8px rgba(255,255,255,0.08);
+  animation: bubble-rise var(--dur, 5s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  width: var(--size, 28px);
+  height: var(--size, 28px);
+}
+
+/* Red string */
+@keyframes string-sway {
+  0%, 100% { transform: rotate(-1deg) scaleX(1); }
+  50%       { transform: rotate(1deg) scaleX(1.01); }
+}
+
+.ambient-string {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(239,68,68,0.55), rgba(239,68,68,0.8), rgba(239,68,68,0.55), transparent);
+  transform-origin: left center;
+  animation: string-sway 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgba(239,68,68,0.5));
+}
+
+/* Glass bottle */
+@keyframes bottle-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%       { transform: translateY(-8px) rotate(3deg); }
+}
+
+.ambient-bottle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  animation: bottle-bob var(--dur, 7s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0.22;
+  font-size: var(--size, 28px);
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+}
+
+/* Key */
+@keyframes key-spin {
+  0%, 100% { transform: rotate(-8deg) translateY(0); }
+  50%       { transform: rotate(8deg) translateY(-6px); }
+}
+
+.ambient-key {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  animation: key-spin var(--dur, 8s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0.2;
+  font-size: var(--size, 22px);
+  filter: drop-shadow(0 0 5px rgba(255,200,100,0.4));
+}
+
+/* Letter / envelope */
+@keyframes letter-drift {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%       { transform: translateY(-10px) rotate(4deg); }
+}
+
+.ambient-letter {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  animation: letter-drift var(--dur, 9s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0.18;
+  font-size: var(--size, 20px);
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.2));
+}

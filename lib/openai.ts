@@ -1,7 +1,19 @@
 import OpenAI from "openai";
 
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// Lazy singleton — avoids crashing at build time when env vars aren't present
+let _openai: OpenAI | null = null;
+export function getOpenAI(): OpenAI {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
+
+/** @deprecated use getOpenAI() — kept for backwards compat with direct imports */
+export const openai = new Proxy({} as OpenAI, {
+  get(_target, prop) {
+    return (getOpenAI() as unknown as Record<string | symbol, unknown>)[prop];
+  },
 });
 
 export const SPARKLE_SYSTEM_PROMPT = `You are Sparkle — a warm, curious AI companion. 
