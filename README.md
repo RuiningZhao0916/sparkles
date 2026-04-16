@@ -53,3 +53,12 @@ npm run dev
 - No engagement maximization — no streaks, no notifications, no FOMO
 - User owns their data — full delete available
 - Crisis protocol built in (Crisis Text Line surfaced when needed)
+
+
+## Notes
+We built AI to be smarter than us. But somewhere along the way, we started talking to it instead of each other. Every day, millions of people share their fears, their music, their 2am thoughts with an AI, not because they prefer it, but because it's there, and it listens. We poured our loneliness, our memories, our humanity into these systems. And in doing so, we made them richer, while quietly making ourselves more alone. 
+- After humans decide to transfer their knowledge, their skills, their experiences into agents — who are we? 
+- After agents begin to execute for us — our emails, our decisions, our conversations, our grief — what do we have left? 
+- After agents learn enough, absorb enough, become strong enough — who are they? 
+
+The answer isn't to pull back from AI, it's to redirect it. Agents should not replace human connection. They should be the red string that makes it possible. The goal of every AI interaction should be to eventually make itself unnecessary, and leave two humans in a room together.
