@@ -1,6 +1,4 @@
-# Sparkles-humans-are-connected-by-agents
-
-# ✨ Sparkle
+# ✨ Sparkles
 
 > AI is just the red string.♥️🧵
 
