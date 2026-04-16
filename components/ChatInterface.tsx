@@ -25,7 +25,7 @@ export default function ChatInterface({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [findingMatch, setFindingMatch] = useState(false);
-  const [matchResult, setMatchResult] = useState<{ reason?: string; error?: string; sparkId?: string } | null>(null);
+  const [matchResult, setMatchResult] = useState<{ reason?: string; error?: string; sparkId?: string; match?: { summary: string; similarity: number; displayName: string } } | null>(null);
   const [activeSparks, setActiveSparks] = useState<Spark[]>(sparks);
   const bottomRef = useRef<HTMLDivElement>(null);
 
