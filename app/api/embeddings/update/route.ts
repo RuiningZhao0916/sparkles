@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { generateEmbedding, summarizeUserSoul } from "@/lib/openai";
 import { NextResponse } from "next/server";
 
@@ -6,7 +6,11 @@ export async function POST(req: Request) {
   const { userId } = await req.json();
   if (!userId) return NextResponse.json({ error: "Missing userId" }, { status: 400 });
 
-  const supabase = await createClient();
+  // Use service role to bypass RLS for background job
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   // Get all user messages
   const { data: messages } = await supabase
