@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     .eq("user_id", userId)
     .order("created_at", { ascending: true });
 
-  const userMessages = messages.filter((m) => m.role === "user");
+  const userMessages = (messages ?? []).filter((m) => m.role === "user");
   if (userMessages.length < 1) {
     return NextResponse.json({ skipped: true });
   }
