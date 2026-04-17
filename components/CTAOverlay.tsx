@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default function CTAOverlay() {
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none p-4">
-      <div className="pointer-events-auto max-w-md rounded-3xl border border-orange-100/80 bg-white/85 px-8 py-9 text-center shadow-[0_24px_80px_-12px_rgba(251,146,60,0.18)] backdrop-blur-md md:max-w-lg md:px-12 md:py-11">
+      <div className="pointer-events-auto max-w-md rounded-3xl border border-amber-200/70 bg-amber-50/90 px-8 py-9 text-center shadow-[0_24px_80px_-12px_rgba(31,41,55,0.10)] backdrop-blur-md md:max-w-lg md:px-12 md:py-11">
         <div className="flex items-center justify-center gap-3">
           <span aria-hidden="true" className="text-xl md:text-2xl">
             ✨
@@ -26,13 +26,13 @@ export default function CTAOverlay() {
         <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:gap-4">
           <Link
             href="/auth/signup"
-            className="font-display rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-8 py-3 text-center text-sm font-normal tracking-wide text-white shadow-sm transition hover:opacity-[0.96] active:scale-[0.99]"
+            className="font-display rounded-full bg-[#fff1a8] px-8 py-3 text-center text-sm font-normal tracking-wide text-stone-900 shadow-sm transition hover:bg-[#ffed94] active:scale-[0.99]"
           >
             Start chatting
           </Link>
           <Link
             href="/auth/login"
-            className="font-display rounded-full border border-orange-300/70 bg-white/60 px-8 py-3 text-center text-sm font-normal tracking-wide text-orange-950/80 backdrop-blur-sm transition hover:border-orange-400/80 hover:bg-white/90"
+            className="font-display rounded-full border border-[#ffe58a] bg-[#fff7c9] px-8 py-3 text-center text-sm font-normal tracking-wide text-stone-900 shadow-sm transition hover:bg-[#fff3b4]"
           >
             Sign in
           </Link>
