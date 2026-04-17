@@ -1,707 +1,176 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import Character from './scene/Character';
-import Clue from './scene/Clue';
-import Prop from './scene/Prop';
-import ThoughtBubble from './scene/ThoughtBubble';
+import { useState } from 'react';
 
-// ─── Connection Animation Overlay ─────────────────────────────────────────────
+// ─── Snoopy SVG (original flat-style beagle, Peanuts-inspired design) ─────────
 
-interface AnimationOverlay {
-  type: AnimationType;
-  fromPos: { x: string; y: string };
-  toPos: { x: string; y: string };
-}
-
-/** Converts a percentage string like "68%" to a number like 68 */
-function pct(s: string): number {
-  return parseFloat(s);
-}
-
-function KeyPassOverlay({ from, to }: { from: { x: string; y: string }; to: { x: string; y: string } }) {
-  const dx = pct(to.x) - pct(from.x);
-  const dy = pct(to.y) - pct(from.y);
+function SnoopySVG({ isHolding }: { isHolding: boolean }) {
   return (
-    <div
-      className="absolute pointer-events-none anim-key-pass"
-      style={{
-        left: from.x,
-        top: from.y,
-        transform: 'translate(-50%, -50%)',
-        zIndex: 5,
-        // CSS custom properties used by key-pass-travel keyframe
-        ['--dest-x' as string]: `${dx}vw`,
-        ['--dest-y' as string]: `${dy}vh`,
-        ['--travel-x' as string]: `${dx * 0.5}vw`,
-        ['--travel-y' as string]: `${dy * 0.5 - 5}vh`,
-      }}
-    >
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="12" cy="14" r="8" fill="#f1c40f" stroke="#1a1a1a" strokeWidth="2.5" />
-        <circle cx="12" cy="14" r="4" fill="none" stroke="#1a1a1a" strokeWidth="2" />
-        <rect x="18" y="12" width="16" height="4" rx="2" fill="#f1c40f" stroke="#1a1a1a" strokeWidth="2" />
-        <rect x="26" y="16" width="3" height="5" rx="1" fill="#f1c40f" stroke="#1a1a1a" strokeWidth="1.5" />
-        <rect x="31" y="16" width="3" height="4" rx="1" fill="#f1c40f" stroke="#1a1a1a" strokeWidth="1.5" />
-      </svg>
-    </div>
-  );
-}
+    <svg width="110" height="130" viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Body — white with black patch */}
+      <ellipse cx="55" cy="88" rx="22" ry="26" fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
+      <ellipse cx="62" cy="96" rx="10" ry="12" fill="#1a1a1a" />
 
-function RedStringOverlay({ from, to }: { from: { x: string; y: string }; to: { x: string; y: string } }) {
-  const [pulling, setPulling] = useState(false);
+      {/* Head */}
+      <ellipse cx="55" cy="52" rx="22" ry="20" fill="white" stroke="#1a1a1a" strokeWidth="2.5" />
 
-  useEffect(() => {
-    const t = setTimeout(() => setPulling(true), 1500);
-    return () => clearTimeout(t);
-  }, []);
+      {/* Ears — long floppy black ears */}
+      <ellipse cx="34" cy="56" rx="8" ry="18" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="1.5" transform="rotate(-10 34 56)" />
+      <ellipse cx="76" cy="56" rx="8" ry="18" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="1.5" transform="rotate(10 76 56)" />
 
-  // Compute SVG dimensions from percentage positions
-  // We render the SVG absolutely spanning the full scene, drawing a line between the two points
-  const fromXPct = pct(from.x);
-  const fromYPct = pct(from.y);
-  const toXPct = pct(to.x);
-  const toYPct = pct(to.y);
+      {/* Eyes */}
+      <circle cx="46" cy="48" r="3.5" fill="#1a1a1a" />
+      <circle cx="64" cy="48" r="3.5" fill="#1a1a1a" />
+      <circle cx="47" cy="47" r="1.2" fill="white" />
+      <circle cx="65" cy="47" r="1.2" fill="white" />
 
-  const pullOffset = pulling ? 3 : 0; // vw/vh nudge toward each other
+      {/* Nose */}
+      <ellipse cx="55" cy="56" rx="5" ry="3.5" fill="#1a1a1a" />
 
-  return (
-    <>
-      {/* SVG line overlay spanning full scene */}
-      <svg
-        className="absolute inset-0 pointer-events-none anim-red-string-extend"
-        style={{ width: '100%', height: '100%', zIndex: 5 }}
-        aria-hidden="true"
-      >
-        <line
-          x1={`${fromXPct}%`}
-          y1={`${fromYPct}%`}
-          x2={`${toXPct}%`}
-          y2={`${toYPct}%`}
-          stroke="#e74c3c"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-      {/* Pull nudge overlays — small circles at each end to show the pull */}
-      {pulling && (
-        <>
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              left: from.x,
-              top: from.y,
-              transform: `translate(-50%, -50%) translate(${pullOffset}vw, 0)`,
-              zIndex: 5,
-              transition: 'transform 0.5s ease-in-out',
-            }}
-          >
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#e74c3c' }} />
-          </div>
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              left: to.x,
-              top: to.y,
-              transform: `translate(-50%, -50%) translate(${-pullOffset}vw, 0)`,
-              zIndex: 5,
-              transition: 'transform 0.5s ease-in-out',
-            }}
-          >
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#e74c3c' }} />
-          </div>
-        </>
+      {/* Smile */}
+      <path d="M48 62 Q55 68 62 62" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" />
+
+      {/* Left arm — reaching down toward star */}
+      <path d="M34 82 Q22 95 18 108" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
+      {/* Right arm — raised to hand off */}
+      <path d="M76 82 Q88 72 92 62" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
+
+      {/* Legs */}
+      <path d="M44 112 Q40 122 36 126" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <path d="M66 112 Q70 122 74 126" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
+
+      {/* Feet */}
+      <ellipse cx="34" cy="127" rx="8" ry="3" fill="#1a1a1a" />
+      <ellipse cx="76" cy="127" rx="8" ry="3" fill="#1a1a1a" />
+
+      {/* Star being held — appears at right hand when isHolding */}
+      {isHolding && (
+        <text x="88" y="58" fontSize="22" textAnchor="middle">🌟</text>
       )}
-    </>
+    </svg>
   );
 }
 
-function BottlePassOverlay({ from, to }: { from: { x: string; y: string }; to: { x: string; y: string } }) {
-  const dx = pct(to.x) - pct(from.x);
-  const dy = pct(to.y) - pct(from.y);
+// ─── Star on the ground ───────────────────────────────────────────────────────
+
+function StarOnGround() {
   return (
     <div
-      className="absolute pointer-events-none anim-bottle-arc"
-      style={{
-        left: from.x,
-        top: from.y,
-        transform: 'translate(-50%, -50%)',
-        zIndex: 5,
-        ['--dest-x' as string]: `${dx}vw`,
-        ['--dest-y' as string]: `${dy}vh`,
-        ['--arc-x' as string]: `${dx * 0.4}vw`,
-        ['--arc-y' as string]: `${dy * 0.4 - 8}vh`,
-      }}
+      className="absolute select-none pointer-events-none"
+      style={{ left: '32%', top: '76%', fontSize: 28, transform: 'translate(-50%, -50%)' }}
+      aria-hidden="true"
     >
-      <svg width="28" height="48" viewBox="0 0 28 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="10" y="2" width="8" height="10" rx="3" fill="#a8d8ea" stroke="#1a1a1a" strokeWidth="2" />
-        <rect x="9" y="1" width="10" height="5" rx="2" fill="#2c3e50" stroke="#1a1a1a" strokeWidth="1.5" />
-        <path d="M8 12 Q4 16 4 22 L4 40 Q4 44 14 44 Q24 44 24 40 L24 22 Q24 16 20 12 Z" fill="#a8d8ea" stroke="#1a1a1a" strokeWidth="2.5" />
-        <path d="M6 30 Q6 42 14 42 Q22 42 22 30 Z" fill="#e74c3c" opacity="0.8" />
-        <path d="M8 18 Q7 26 7 32" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-      </svg>
+      🌟
     </div>
   );
 }
 
-function DogRunOverlay({ from, to }: { from: { x: string; y: string }; to: { x: string; y: string } }) {
-  const dx = pct(to.x) - pct(from.x);
+// ─── Dancing girl SVG (Sally-inspired: yellow hair, pink dress, arms out) ─────
+
+function DancingGirlSVG({ isReceiving }: { isReceiving: boolean }) {
   return (
-    <div
-      className="absolute pointer-events-none anim-dog-run"
-      style={{
-        left: from.x,
-        top: from.y,
-        transform: 'translate(-50%, -50%)',
-        zIndex: 5,
-        ['--run-dist' as string]: `${dx}vw`,
-      }}
-    >
-      {/* Simple dog silhouette */}
-      <svg width="56" height="40" viewBox="0 0 56 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        {/* Body */}
-        <ellipse cx="28" cy="26" rx="16" ry="9" fill="#c8a97e" stroke="#1a1a1a" strokeWidth="2" />
-        {/* Head */}
-        <circle cx="44" cy="18" r="9" fill="#c8a97e" stroke="#1a1a1a" strokeWidth="2" />
-        {/* Ear */}
-        <ellipse cx="48" cy="12" rx="4" ry="6" fill="#b8956a" stroke="#1a1a1a" strokeWidth="1.5" />
-        {/* Eye */}
-        <circle cx="47" cy="17" r="2" fill="#1a1a1a" />
-        {/* Nose */}
-        <ellipse cx="52" cy="20" rx="2.5" ry="1.5" fill="#1a1a1a" />
-        {/* Tail */}
-        <path d="M12 22 Q4 14 8 8" stroke="#c8a97e" strokeWidth="3" strokeLinecap="round" fill="none" />
-        {/* Legs */}
-        <rect x="18" y="32" width="5" height="8" rx="2" fill="#c8a97e" stroke="#1a1a1a" strokeWidth="1.5" />
-        <rect x="26" y="32" width="5" height="8" rx="2" fill="#c8a97e" stroke="#1a1a1a" strokeWidth="1.5" />
-        <rect x="34" y="32" width="5" height="8" rx="2" fill="#c8a97e" stroke="#1a1a1a" strokeWidth="1.5" />
-      </svg>
-    </div>
+    <svg width="100" height="130" viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Head */}
+      <circle cx="50" cy="22" r="18" fill="#f5c842" stroke="#1a1a1a" strokeWidth="2.5" />
+
+      {/* Hair — big fluffy yellow */}
+      <ellipse cx="50" cy="10" rx="18" ry="10" fill="#f5c842" stroke="#1a1a1a" strokeWidth="2" />
+      <ellipse cx="32" cy="18" rx="7" ry="12" fill="#f5c842" stroke="#1a1a1a" strokeWidth="2" />
+      <ellipse cx="68" cy="18" rx="7" ry="12" fill="#f5c842" stroke="#1a1a1a" strokeWidth="2" />
+
+      {/* Eyes */}
+      <circle cx="43" cy="20" r="3" fill="#1a1a1a" />
+      <circle cx="57" cy="20" r="3" fill="#1a1a1a" />
+      <circle cx="44" cy="19" r="1" fill="white" />
+      <circle cx="58" cy="19" r="1" fill="white" />
+
+      {/* Smile */}
+      <path d="M43 28 Q50 34 57 28" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" />
+
+      {/* Dress body — pink */}
+      <path d="M32 40 Q28 70 24 90 L76 90 Q72 70 68 40 Z" fill="#f48fb1" stroke="#1a1a1a" strokeWidth="2.5" />
+      {/* Dress collar */}
+      <path d="M38 40 Q50 48 62 40" stroke="#1a1a1a" strokeWidth="2" fill="none" />
+
+      {/* Left arm — raised up in dance */}
+      <path d="M32 50 Q18 38 12 28" stroke="#f5c842" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M32 50 Q18 38 12 28" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+      {/* Right arm — reaching toward Snoopy to receive star */}
+      <path d="M68 50 Q82 44 90 40" stroke="#f5c842" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M68 50 Q82 44 90 40" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+      {/* Legs — one kicked out for dancing */}
+      <path d="M40 90 Q36 108 32 118" stroke="#f5c842" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M40 90 Q36 108 32 118" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M60 90 Q66 106 72 112" stroke="#f5c842" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M60 90 Q66 106 72 112" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+      {/* Shoes */}
+      <ellipse cx="30" cy="120" rx="9" ry="4" fill="#e74c3c" stroke="#1a1a1a" strokeWidth="1.5" />
+      <ellipse cx="74" cy="114" rx="9" ry="4" fill="#e74c3c" stroke="#1a1a1a" strokeWidth="1.5" transform="rotate(-20 74 114)" />
+
+      {/* Star received — appears at left hand when receiving */}
+      {isReceiving && (
+        <text x="10" y="26" fontSize="22" textAnchor="middle">🌟</text>
+      )}
+    </svg>
   );
 }
 
-function ConnectionAnimationOverlay({ overlay }: { overlay: AnimationOverlay }) {
-  switch (overlay.type) {
-    case 'key-pass':
-      return <KeyPassOverlay from={overlay.fromPos} to={overlay.toPos} />;
-    case 'red-string-pull':
-      return <RedStringOverlay from={overlay.fromPos} to={overlay.toPos} />;
-    case 'bottle-pass':
-      return <BottlePassOverlay from={overlay.fromPos} to={overlay.toPos} />;
-    case 'dog-interaction':
-      return <DogRunOverlay from={overlay.fromPos} to={overlay.toPos} />;
-    default:
-      return null;
-  }
-}
+// ─── Scene states ─────────────────────────────────────────────────────────────
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type CharacterId =
-  | 'guitar-girl'
-  | 'tree-boy'
-  | 'dog'
-  | 'software-engineer'
-  | 'painter'
-  | 'basketball-woman';
-
-export type ClueId = 'red-string' | 'key' | 'letter' | 'bottle';
-
-export type PropId = 'chair' | 'vinyl-record' | 'shoe';
-
-export type AnimationType =
-  | 'key-pass'
-  | 'red-string-pull'
-  | 'bottle-pass'
-  | 'dog-interaction';
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-export const ANIMATION_DURATION_MS = 3000;
-export const THOUGHT_DISMISS_MS = 4000;
-
-// ─── Data Maps ────────────────────────────────────────────────────────────────
-
-export const CHARACTERS: Record<
-  CharacterId,
-  {
-    label: string;
-    position: { x: string; y: string };
-    animation: AnimationType;
-    mobileVisible: boolean;
-    ariaLabel: string;
-  }
-> = {
-  'guitar-girl': {
-    label: 'Girl playing guitar',
-    position: { x: '10%', y: '60%' },
-    animation: 'red-string-pull',
-    mobileVisible: true,
-    ariaLabel: 'Girl playing guitar — click to connect',
-  },
-  'tree-boy': {
-    label: 'Boy planting a tree',
-    position: { x: '25%', y: '65%' },
-    animation: 'bottle-pass',
-    mobileVisible: false,
-    ariaLabel: 'Boy planting a tree — click to connect',
-  },
-  dog: {
-    label: 'Dog playing with a ball',
-    position: { x: '50%', y: '72%' },
-    animation: 'dog-interaction',
-    mobileVisible: true,
-    ariaLabel: 'Dog playing with a ball — click to connect',
-  },
-  'software-engineer': {
-    label: 'Software engineer coding',
-    position: { x: '68%', y: '62%' },
-    animation: 'key-pass',
-    mobileVisible: true,
-    ariaLabel: 'Software engineer coding — click to connect',
-  },
-  painter: {
-    label: 'Painter painting',
-    position: { x: '82%', y: '68%' },
-    animation: 'red-string-pull',
-    mobileVisible: false,
-    ariaLabel: 'Painter painting — click to connect',
-  },
-  'basketball-woman': {
-    label: 'Woman playing basketball',
-    position: { x: '40%', y: '58%' },
-    animation: 'bottle-pass',
-    mobileVisible: false,
-    ariaLabel: 'Woman playing basketball — click to connect',
-  },
-};
-
-export const CLUES: Record<
-  ClueId,
-  {
-    position: { x: string; y: string };
-    thought: string;
-    ariaLabel: string;
-  }
-> = {
-  'red-string': {
-    position: { x: '30%', y: '40%' },
-    thought: 'I like red coach. What are you listening to?',
-    ariaLabel: 'Red string — click to discover',
-  },
-  key: {
-    position: { x: '60%', y: '35%' },
-    thought: 'Someone left this. Maybe it opens something.',
-    ariaLabel: 'Key — click to discover',
-  },
-  letter: {
-    position: { x: '15%', y: '30%' },
-    thought: 'Unsent. Still warm.',
-    ariaLabel: 'Letter — click to discover',
-  },
-  bottle: {
-    position: { x: '78%', y: '45%' },
-    thought: 'A message, waiting for the right tide.',
-    ariaLabel: 'Glass bottle — click to discover',
-  },
-};
-
-export const PROPS: Record<
-  PropId,
-  {
-    position: { x: string; y: string };
-    ariaLabel: string;
-  }
-> = {
-  chair: {
-    position: { x: '20%', y: '75%' },
-    ariaLabel: 'Chair — click to interact',
-  },
-  'vinyl-record': {
-    position: { x: '55%', y: '50%' },
-    ariaLabel: 'Vinyl record — click to interact',
-  },
-  shoe: {
-    position: { x: '88%', y: '78%' },
-    ariaLabel: 'Single shoe — click to interact',
-  },
-};
-
-// ─── useReducedMotion hook ────────────────────────────────────────────────────
-
-function useReducedMotion(): boolean {
-  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return reducedMotion;
-}
-
-// ─── Scene State ─────────────────────────────────────────────────────────────
-
-type CharacterAnimState = 'idle' | 'animating' | 'paused';
-
-const CHARACTER_IDS = Object.keys(CHARACTERS) as CharacterId[];
-
-function initialCharacterStates(): Record<CharacterId, CharacterAnimState> {
-  return CHARACTER_IDS.reduce(
-    (acc, id) => ({ ...acc, [id]: 'idle' as CharacterAnimState }),
-    {} as Record<CharacterId, CharacterAnimState>
-  );
-}
-
-// ─── SceneController ─────────────────────────────────────────────────────────
+type ScenePhase = 'idle' | 'holding' | 'given';
 
 export default function SceneController() {
-  const reducedMotion = useReducedMotion();
+  const [phase, setPhase] = useState<ScenePhase>('idle');
 
-  const [characterStates, setCharacterStates] = useState<
-    Record<CharacterId, CharacterAnimState>
-  >(initialCharacterStates);
-
-  const [activeAnimation, setActiveAnimation] = useState<AnimationType | null>(null);
-  const [animationQueue, setAnimationQueue] = useState<AnimationType[]>([]);
-  const [activeThought, setActiveThought] = useState<{
-    clueId: ClueId;
-    message: string;
-  } | null>(null);
-  const [animationOverlay, setAnimationOverlay] = useState<AnimationOverlay | null>(null);
-
-  // Viewport width for responsive behavior (task 7 will refine)
-  const [viewportWidth, setViewportWidth] = useState<number>(
-    typeof window !== 'undefined' ? window.innerWidth : 1024
-  );
-
-  // Refs to hold mutable values without triggering re-renders
-  const activeAnimationRef = useRef<AnimationType | null>(null);
-  const animationQueueRef = useRef<AnimationType[]>([]);
-  const thoughtDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Keep refs in sync
-  useEffect(() => {
-    activeAnimationRef.current = activeAnimation;
-  }, [activeAnimation]);
-
-  useEffect(() => {
-    animationQueueRef.current = animationQueue;
-  }, [animationQueue]);
-
-  // ── Viewport resize listener (ResizeObserver on document.body) ───────────
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const observer = new ResizeObserver(() => {
-      setViewportWidth(document.documentElement.clientWidth);
-    });
-    observer.observe(document.body);
-    return () => observer.disconnect();
-  }, []);
-
-  // ── Animation helpers ─────────────────────────────────────────────────────
-
-  /** Returns the character IDs involved in a given animation type */
-  function getInvolvedCharacters(animType: AnimationType): CharacterId[] {
-    switch (animType) {
-      case 'red-string-pull':
-        return ['guitar-girl', 'painter'];
-      case 'bottle-pass':
-        return ['tree-boy', 'basketball-woman'];
-      case 'key-pass':
-        return ['software-engineer', 'guitar-girl'];
-      case 'dog-interaction':
-        return ['dog', 'software-engineer'];
-      default:
-        return [];
+  function handleSnoopyClick() {
+    if (phase === 'idle') {
+      // Snoopy picks up the star
+      setPhase('holding');
+      // After a beat, hand it to the girl
+      setTimeout(() => setPhase('given'), 1200);
     }
   }
-
-  /** Returns the from/to positions for the animation overlay */
-  function getOverlayPositions(animType: AnimationType): { fromPos: { x: string; y: string }; toPos: { x: string; y: string } } {
-    const [fromId, toId] = getInvolvedCharacters(animType);
-    return {
-      fromPos: CHARACTERS[fromId].position,
-      toPos: CHARACTERS[toId].position,
-    };
-  }
-
-  const processNextInQueue = useCallback(() => {
-    const queue = animationQueueRef.current;
-    if (queue.length === 0) return;
-
-    const [next, ...rest] = queue;
-    setAnimationQueue(rest);
-    animationQueueRef.current = rest;
-
-    const involved = getInvolvedCharacters(next);
-
-    try {
-      setCharacterStates((prev) => {
-        const updated = { ...prev };
-        involved.forEach((id) => { updated[id] = 'paused'; });
-        return updated;
-      });
-      setActiveAnimation(next);
-      activeAnimationRef.current = next;
-      const { fromPos, toPos } = getOverlayPositions(next);
-      setAnimationOverlay({ type: next, fromPos, toPos });
-
-      setTimeout(() => {
-        try {
-          setCharacterStates((prev) => {
-            const updated = { ...prev };
-            involved.forEach((id) => { updated[id] = 'idle'; });
-            return updated;
-          });
-          setActiveAnimation(null);
-          activeAnimationRef.current = null;
-          setAnimationOverlay(null);
-          processNextInQueue();
-        } catch (err) {
-          console.error('[SceneController] Error resuming after animation', next, involved, err);
-          setCharacterStates((prev) => {
-            const updated = { ...prev };
-            involved.forEach((id) => { updated[id] = 'idle'; });
-            return updated;
-          });
-          setActiveAnimation(null);
-          activeAnimationRef.current = null;
-          setAnimationOverlay(null);
-          processNextInQueue();
-        }
-      }, ANIMATION_DURATION_MS);
-    } catch (err) {
-      console.error('[SceneController] Error starting animation', next, involved, err);
-      setCharacterStates((prev) => {
-        const updated = { ...prev };
-        involved.forEach((id) => { updated[id] = 'idle'; });
-        return updated;
-      });
-      setActiveAnimation(null);
-      activeAnimationRef.current = null;
-      setAnimationOverlay(null);
-      processNextInQueue();
-    }
-  }, []);
-
-  // ── handleCharacterClick ──────────────────────────────────────────────────
-
-  const handleCharacterClick = useCallback(
-    (id: CharacterId) => {
-      try {
-        const animType = CHARACTERS[id].animation;
-
-        if (activeAnimationRef.current !== null) {
-          // Enqueue
-          setAnimationQueue((prev) => {
-            const updated = [...prev, animType];
-            animationQueueRef.current = updated;
-            return updated;
-          });
-          return;
-        }
-
-        const involved = getInvolvedCharacters(animType);
-
-        setCharacterStates((prev) => {
-          const updated = { ...prev };
-          involved.forEach((cid) => { updated[cid] = 'paused'; });
-          return updated;
-        });
-        setActiveAnimation(animType);
-        activeAnimationRef.current = animType;
-        const { fromPos, toPos } = getOverlayPositions(animType);
-        setAnimationOverlay({ type: animType, fromPos, toPos });
-
-        setTimeout(() => {
-          try {
-            setCharacterStates((prev) => {
-              const updated = { ...prev };
-              involved.forEach((cid) => { updated[cid] = 'idle'; });
-              return updated;
-            });
-            setActiveAnimation(null);
-            activeAnimationRef.current = null;
-            setAnimationOverlay(null);
-            processNextInQueue();
-          } catch (err) {
-            console.error(
-              '[SceneController] Error completing animation',
-              animType,
-              involved,
-              err
-            );
-            setCharacterStates((prev) => {
-              const updated = { ...prev };
-              involved.forEach((cid) => { updated[cid] = 'idle'; });
-              return updated;
-            });
-            setActiveAnimation(null);
-            activeAnimationRef.current = null;
-            setAnimationOverlay(null);
-            processNextInQueue();
-          }
-        }, ANIMATION_DURATION_MS);
-      } catch (err) {
-        console.error('[SceneController] Error in handleCharacterClick', id, err);
-        const animType = CHARACTERS[id]?.animation;
-        if (animType) {
-          const involved = getInvolvedCharacters(animType);
-          setCharacterStates((prev) => {
-            const updated = { ...prev };
-            involved.forEach((cid) => { updated[cid] = 'idle'; });
-            return updated;
-          });
-        }
-        setActiveAnimation(null);
-        activeAnimationRef.current = null;
-        setAnimationOverlay(null);
-        processNextInQueue();
-      }
-    },
-    [processNextInQueue]
-  );
-
-  // ── handleClueClick ───────────────────────────────────────────────────────
-
-  const handleClueClick = useCallback((id: ClueId) => {
-    const clue = CLUES[id];
-    if (!clue) return;
-
-    // Clear any existing dismiss timer
-    if (thoughtDismissTimer.current !== null) {
-      clearTimeout(thoughtDismissTimer.current);
-      thoughtDismissTimer.current = null;
-    }
-
-    setActiveThought({ clueId: id, message: clue.thought });
-
-    thoughtDismissTimer.current = setTimeout(() => {
-      setActiveThought(null);
-      thoughtDismissTimer.current = null;
-    }, THOUGHT_DISMISS_MS);
-  }, []);
-
-  const dismissThought = useCallback(() => {
-    if (thoughtDismissTimer.current !== null) {
-      clearTimeout(thoughtDismissTimer.current);
-      thoughtDismissTimer.current = null;
-    }
-    setActiveThought(null);
-  }, []);
-
-  // ── handlePropClick ───────────────────────────────────────────────────────
-
-  const handlePropClick = useCallback((id: PropId) => {
-    const prop = PROPS[id];
-    if (!prop) return;
-
-    const propX = parseFloat(prop.position.x);
-    const propY = parseFloat(prop.position.y);
-
-    // Find nearest character by Euclidean distance on percentage positions
-    let nearestId: CharacterId | null = null;
-    let nearestDist = Infinity;
-
-    CHARACTER_IDS.forEach((cid) => {
-      const charX = parseFloat(CHARACTERS[cid].position.x);
-      const charY = parseFloat(CHARACTERS[cid].position.y);
-      const dist = Math.sqrt((charX - propX) ** 2 + (charY - propY) ** 2);
-      if (dist < nearestDist) {
-        nearestDist = dist;
-        nearestId = cid;
-      }
-    });
-
-    if (!nearestId) return;
-
-    const neighbor = nearestId as CharacterId;
-
-    setCharacterStates((prev) => ({ ...prev, [neighbor]: 'animating' }));
-
-    setTimeout(() => {
-      setCharacterStates((prev) => ({ ...prev, [neighbor]: 'idle' }));
-    }, 1500);
-  }, []);
-
-  // ── Cleanup on unmount ────────────────────────────────────────────────────
-
-  useEffect(() => {
-    return () => {
-      if (thoughtDismissTimer.current !== null) {
-        clearTimeout(thoughtDismissTimer.current);
-      }
-    };
-  }, []);
-
-  // ── Render ────────────────────────────────────────────────────────────────
-
-  const isMobile = viewportWidth < 768;
 
   return (
     <div className="w-full h-screen relative overflow-hidden bg-white">
-      {/* Characters */}
-      {CHARACTER_IDS.map((id) => (
-        <Character
-          key={id}
-          id={id}
-          state={characterStates[id]}
-          position={CHARACTERS[id].position}
-          size={isMobile ? 64 : 96}
-          onClick={handleCharacterClick}
-          ariaLabel={CHARACTERS[id].ariaLabel}
-          hidden={isMobile && !CHARACTERS[id].mobileVisible}
-          reducedMotion={reducedMotion}
-        />
-      ))}
+      {/* Ground line */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px bg-gray-200"
+        style={{ bottom: '18%' }}
+      />
 
-      {/* Clues */}
-      {(Object.keys(CLUES) as ClueId[]).map((id) => (
-        <Clue
-          key={id}
-          id={id}
-          state={activeThought?.clueId === id ? 'active' : 'idle'}
-          position={CLUES[id].position}
-          onClick={handleClueClick}
-          ariaLabel={CLUES[id].ariaLabel}
-          reducedMotion={reducedMotion}
-        />
-      ))}
+      {/* Star on the ground — only visible before Snoopy picks it up */}
+      {phase === 'idle' && <StarOnGround />}
 
-      {/* Props */}
-      {(Object.keys(PROPS) as PropId[]).map((id) => (
-        <Prop
-          key={id}
-          id={id}
-          state="idle"
-          position={PROPS[id].position}
-          onClick={handlePropClick}
-          ariaLabel={PROPS[id].ariaLabel}
-          reducedMotion={reducedMotion}
-        />
-      ))}
+      {/* Snoopy — left side */}
+      <button
+        aria-label="Snoopy — click to pick up the star"
+        onClick={handleSnoopyClick}
+        className="absolute bg-transparent border-none p-0 cursor-pointer"
+        style={{
+          left: '28%',
+          bottom: '18%',
+          transform: 'translateX(-50%)',
+        }}
+      >
+        <SnoopySVG isHolding={phase === 'holding'} />
+      </button>
 
-      {/* Connection Animation Overlay */}
-      {animationOverlay && !reducedMotion && (
-        <ConnectionAnimationOverlay overlay={animationOverlay} />
-      )}
-
-      {/* Thought Bubble */}
-      {activeThought && (
-        <ThoughtBubble
-          message={activeThought.message}
-          anchorPosition={CLUES[activeThought.clueId].position}
-          onDismiss={dismissThought}
-        />
-      )}
+      {/* Dancing girl — right side */}
+      <div
+        className="absolute"
+        style={{
+          left: '62%',
+          bottom: '18%',
+          transform: 'translateX(-50%)',
+        }}
+        aria-label="Dancing girl"
+      >
+        <DancingGirlSVG isReceiving={phase === 'given'} />
+      </div>
     </div>
   );
 }
