@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #f5f5f0;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
 }
 
 body {
@@ -140,4 +140,159 @@ body {
   opacity: 0.18;
   font-size: var(--size, 20px);
   filter: drop-shadow(0 0 4px rgba(255,255,255,0.2));
+}
+
+/* ── Character idle animations ── */
+
+@keyframes idle-bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes guitar-strum {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25%       { transform: rotate(-4deg) translateY(-2px); }
+  75%       { transform: rotate(4deg) translateY(-2px); }
+}
+
+@keyframes tree-plant {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  40%       { transform: translateY(-4px) scaleY(1.03); }
+  60%       { transform: translateY(2px) scaleY(0.98); }
+}
+
+@keyframes dog-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%       { transform: translateY(-10px) rotate(-5deg); }
+  60%       { transform: translateY(-4px) rotate(5deg); }
+}
+
+@keyframes type-tap {
+  0%, 100% { transform: translateY(0); }
+  20%       { transform: translateY(-3px); }
+  40%       { transform: translateY(0); }
+  60%       { transform: translateY(-2px); }
+  80%       { transform: translateY(0); }
+}
+
+@keyframes brush-stroke {
+  0%, 100% { transform: rotate(-8deg) translateX(0); }
+  50%       { transform: rotate(8deg) translateX(6px); }
+}
+
+@keyframes ball-dribble {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  45%       { transform: translateY(12px) scaleY(0.85); }
+  55%       { transform: translateY(12px) scaleY(0.85); }
+  80%       { transform: translateY(-14px) scaleY(1.05); }
+}
+
+/* ── Clue ambient animations ── */
+
+@keyframes clue-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%       { transform: rotate(4deg); }
+}
+
+@keyframes clue-bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes clue-drift {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%       { transform: translateY(-10px) rotate(3deg); }
+}
+
+/* ── Prop ambient animations ── */
+
+@keyframes chair-rock {
+  0%, 100% { transform: rotate(0deg); transform-origin: bottom center; }
+  30%       { transform: rotate(-3deg); transform-origin: bottom center; }
+  70%       { transform: rotate(3deg); transform-origin: bottom center; }
+}
+
+@keyframes record-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes shoe-tap {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40%       { transform: translateY(-5px) rotate(-8deg); }
+  60%       { transform: translateY(-5px) rotate(8deg); }
+}
+
+/* ── Connection animation keyframes ── */
+
+@keyframes key-pass-travel {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  50%  { transform: translate(var(--travel-x, 120px), var(--travel-y, -40px)) rotate(180deg); opacity: 1; }
+  100% { transform: translate(var(--dest-x, 240px), var(--dest-y, 0px)) rotate(360deg); opacity: 0; }
+}
+
+@keyframes red-string-extend {
+  0%   { width: 0; opacity: 0; }
+  20%  { opacity: 1; }
+  100% { width: var(--string-length, 200px); opacity: 1; }
+}
+
+@keyframes bottle-arc {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  40%  { transform: translate(var(--arc-x, 80px), var(--arc-y, -60px)) rotate(45deg); opacity: 1; }
+  100% { transform: translate(var(--dest-x, 200px), var(--dest-y, 0px)) rotate(90deg); opacity: 0.8; }
+}
+
+@keyframes dog-run-move {
+  0%   { transform: translateX(0) scaleX(1); }
+  45%  { transform: translateX(var(--run-dist, 100px)) scaleX(1); }
+  50%  { transform: translateX(var(--run-dist, 100px)) scaleX(-1); }
+  100% { transform: translateX(0) scaleX(-1); }
+}
+
+/* ── Animation utility classes ── */
+
+.anim-idle-bob      { animation: idle-bob 2.4s ease-in-out infinite; }
+.anim-guitar-strum  { animation: guitar-strum 1.2s ease-in-out infinite; }
+.anim-tree-plant    { animation: tree-plant 2s ease-in-out infinite; }
+.anim-dog-bounce    { animation: dog-bounce 1s ease-in-out infinite; }
+.anim-type-tap      { animation: type-tap 1.6s ease-in-out infinite; }
+.anim-brush-stroke  { animation: brush-stroke 2.2s ease-in-out infinite; }
+.anim-ball-dribble  { animation: ball-dribble 0.9s ease-in-out infinite; }
+
+.anim-clue-sway     { animation: clue-sway 4s ease-in-out infinite; }
+.anim-clue-bob      { animation: clue-bob 3.5s ease-in-out infinite; }
+.anim-clue-drift    { animation: clue-drift 5s ease-in-out infinite; }
+
+.anim-chair-rock    { animation: chair-rock 3s ease-in-out infinite; }
+.anim-record-spin   { animation: record-spin 3s linear infinite; }
+.anim-shoe-tap      { animation: shoe-tap 2s ease-in-out infinite; }
+
+.anim-key-pass          { animation: key-pass-travel 3s ease-in-out forwards; }
+.anim-red-string-extend { animation: red-string-extend 3s ease-out forwards; }
+.anim-bottle-arc        { animation: bottle-arc 3s ease-in-out forwards; }
+.anim-dog-run           { animation: dog-run-move 3s ease-in-out forwards; }
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-idle-bob,
+  .anim-guitar-strum,
+  .anim-tree-plant,
+  .anim-dog-bounce,
+  .anim-type-tap,
+  .anim-brush-stroke,
+  .anim-ball-dribble,
+  .anim-clue-sway,
+  .anim-clue-bob,
+  .anim-clue-drift,
+  .anim-chair-rock,
+  .anim-record-spin,
+  .anim-shoe-tap,
+  .anim-key-pass,
+  .anim-red-string-extend,
+  .anim-bottle-arc,
+  .anim-dog-run {
+    animation: none;
+  }
 }
