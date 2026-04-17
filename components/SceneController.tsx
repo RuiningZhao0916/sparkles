@@ -1,15 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { type StarScenePhase, bundleAtSnoopy, bundleWithLydia, floorStarsVisible } from '@/lib/sceneHeroStars';
-
-const HERO_SRC =
-  typeof process !== 'undefined' && process.env.NEXT_PUBLIC_SCENE_HERO_SRC
-    ? process.env.NEXT_PUBLIC_SCENE_HERO_SRC
-    : '/images/snoopy-lydia-hero.png';
-
-const HERO_IS_REMOTE = /^https?:\/\//i.test(HERO_SRC);
+import LineFigureSparkles from '@/components/LineFigureSparkles';
 
 /** Floor star positions (% of scene box) — tune when swapping hero art */
 const FLOOR_STARS: { left: string; bottom: string; delayMs: number }[] = [
@@ -98,36 +91,23 @@ export default function SceneController() {
   return (
     <div className="w-full min-h-screen relative overflow-hidden bg-gradient-to-b from-[#fff9f4] via-[#fff5ef] to-[#ffe8dc]">
       <div className="absolute inset-0 pointer-events-none opacity-[0.35] bg-[radial-gradient(ellipse_80%_50%_at_50%_100%,rgba(251,146,60,0.25),transparent)]" />
+      <LineFigureSparkles />
 
       <div className="relative z-[5] flex min-h-screen flex-col items-center justify-end pb-6 md:pb-10 pt-24 md:pt-28">
         <div
           className="relative w-full max-w-5xl px-4 md:px-8"
           style={{ height: 'min(52vh, 420px)' }}
         >
-          {HERO_IS_REMOTE ? (
-            // eslint-disable-next-line @next/next/no-img-element -- optional remote hero via NEXT_PUBLIC_SCENE_HERO_SRC
-            <img
-              src={HERO_SRC}
-              alt="Snoopy plays guitar while Lydia dances beside him"
-              className="absolute inset-0 h-full w-full object-contain object-bottom select-none drop-shadow-sm"
-            />
-          ) : (
-            <Image
-              src={HERO_SRC}
-              alt="Snoopy plays guitar while Lydia dances beside him"
-              fill
-              priority
-              className="object-contain object-bottom select-none drop-shadow-sm"
-              sizes="(max-width: 768px) 100vw, 896px"
-            />
-          )}
+          <div className="absolute inset-0 opacity-[0.22]">
+            <div className="absolute inset-x-0 bottom-[14%] h-px bg-gradient-to-r from-transparent via-orange-950/25 to-transparent" />
+          </div>
 
           <button
             type="button"
-            aria-label="Tap Snoopy: stars appear, then he gathers them for Lydia"
+            aria-label="Tap: reveal stars, then they travel to a dancer"
             onClick={handleSnoopyClick}
             disabled={phase !== 'rest'}
-            className="absolute left-[4%] bottom-[4%] h-[62%] w-[42%] max-w-[320px] cursor-pointer rounded-3xl bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-400 disabled:cursor-default"
+            className="absolute left-[10%] top-[10%] h-[80%] w-[80%] cursor-pointer rounded-3xl bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-400 disabled:cursor-default"
           />
 
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">

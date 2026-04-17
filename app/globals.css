@@ -42,6 +42,24 @@ body {
   50%       { opacity: 0.9;  transform: scale(1.2) rotate(20deg); }
 }
 
+.line-figure {
+  position: absolute;
+  will-change: opacity, transform, filter;
+  transform-origin: center;
+  filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.08));
+}
+
+@keyframes line-figure-sparkle {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.985) rotate(var(--rot, 0deg)); filter: drop-shadow(0 12px 26px rgba(15, 23, 42, 0.06)); }
+  35%  { opacity: 1; transform: translateY(0) scale(1) rotate(var(--rot, 0deg)); filter: drop-shadow(0 22px 46px rgba(251, 146, 60, 0.12)); }
+  60%  { opacity: 0.75; transform: translateY(-1px) scale(1.005) rotate(var(--rot, 0deg)); filter: drop-shadow(0 22px 46px rgba(251, 146, 60, 0.10)); }
+  100% { opacity: 0; transform: translateY(-4px) scale(0.99) rotate(var(--rot, 0deg)); filter: drop-shadow(0 12px 26px rgba(15, 23, 42, 0.06)); }
+}
+
+.line-figure--active {
+  animation: line-figure-sparkle 1.55s ease-in-out forwards;
+}
+
 .ambient-sparkle {
   position: fixed;
   pointer-events: none;
